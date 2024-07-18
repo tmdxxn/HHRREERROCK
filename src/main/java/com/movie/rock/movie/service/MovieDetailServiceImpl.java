@@ -17,7 +17,7 @@ public class MovieDetailServiceImpl implements MovieDetailService {
     @Override
     @Transactional(readOnly = true)
     public MovieDetailResponseDTO getMovieDetail(Long movieId, Long memNum) {
-        MovieEntity movie = movieRepository.findByIdWithAllDetails(movieId)
+        MovieEntity movie = movieRepository.findMovieById(movieId)
                 .orElseThrow(MovieNotFoundException::new);
 
         return MovieDetailResponseDTO.fromEntity(movie);

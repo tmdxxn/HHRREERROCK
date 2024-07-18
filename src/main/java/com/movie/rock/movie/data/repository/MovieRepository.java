@@ -12,20 +12,25 @@ import java.util.Optional;
 public interface MovieRepository extends JpaRepository<MovieEntity, Long> {
     Optional<MovieEntity> findByMovieId(Long movieId);
 
-    @Query("SELECT DISTINCT m FROM MovieEntity m " +
-            "LEFT JOIN FETCH m.movieActors ma " +
-            "LEFT JOIN FETCH ma.actor a " +
-            "LEFT JOIN FETCH a.actorPhotos " +
-            "LEFT JOIN FETCH m.movieDirectors md " +
-            "LEFT JOIN FETCH md.director d " +
-            "LEFT JOIN FETCH d.directorPhotos " +
-            "LEFT JOIN FETCH m.genres mg " +
-            "LEFT JOIN FETCH mg.genre " +
-            "LEFT JOIN FETCH m.poster " +
-            "LEFT JOIN FETCH m.trailer " +
-            "LEFT JOIN FETCH m.movieFilm " +
-            "LEFT JOIN FETCH m.reviews r " +
-            "LEFT JOIN FETCH r.member " +
+    @Query("SELECT m " +
+            "FROM MovieEntity m " +
             "WHERE m.movieId = :movieId")
-    Optional<MovieEntity> findByIdWithAllDetails(@Param("movieId") Long movieId);
+    Optional<MovieEntity> findMovieById(@Param("movieId") Long movieId);
+
+//    @Query("SELECT m " +
+//            "FROM MovieEntity m " +
+//            "LEFT JOIN FETCH m.movieActors ma " +
+//            "LEFT JOIN FETCH ma.actor a " +
+//            "LEFT JOIN FETCH a.actorPhotos " +
+//            "LEFT JOIN FETCH m.movieDirectors md " +
+//            "LEFT JOIN FETCH md.director d " +
+//            "LEFT JOIN FETCH d.directorPhotos " +
+//            "LEFT JOIN FETCH m.genres g " +
+//            "LEFT JOIN FETCH m.poster " +
+//            "LEFT JOIN FETCH m.trailer " +
+//            "LEFT JOIN FETCH m.movieFilm " +
+//            "LEFT JOIN FETCH m.reviews r " +
+//            "LEFT JOIN FETCH r.member " +
+//            "WHERE m.movieId = :movieId")
+//    Optional<MovieEntity> findMovieById(@Param("movieId") Long movieId);
 }

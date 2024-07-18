@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class MovieInfoResponseDTO {
 
     @Getter
@@ -14,10 +17,10 @@ public class MovieInfoResponseDTO {
         private Long actorId;
         private String actorName;
         private Integer actorBirth;
-        private String actorPhoto;
+        private List<PhotoResponseDTO> actorPhoto;
 
         @Builder
-        public ActorResponseDTO(Long actorId, String actorName, Integer actorBirth, String actorPhoto) {
+        public ActorResponseDTO(Long actorId, String actorName, Integer actorBirth, List<PhotoResponseDTO> actorPhoto) {
             this.actorId = actorId;
             this.actorName = actorName;
             this.actorBirth = actorBirth;
@@ -25,11 +28,18 @@ public class MovieInfoResponseDTO {
         }
 
         public static ActorResponseDTO fromEntity(ActorsEntity actors) {
+            if (actors == null) {
+                return null;
+            }
+            List<PhotoResponseDTO> photos = actors.getActorPhotos().stream()
+                    .map(photoEntity -> PhotoResponseDTO.fromEntity(photoEntity.getPhotos()))
+                    .collect(Collectors.toList());
+
             return ActorResponseDTO.builder()
                     .actorId(actors.getActorId())
                     .actorName(actors.getActorName())
                     .actorBirth(actors.getActorBirth())
-                    .actorPhoto(actors.getActorPhotos().toString())
+                    .actorPhoto(photos)
                     .build();
         }
     }
@@ -41,10 +51,10 @@ public class MovieInfoResponseDTO {
         private Long directorId;
         private String directorName;
         private Integer directorBirth;
-        private String directorPhoto;
+        private List<PhotoResponseDTO> directorPhoto;
 
         @Builder
-        public DirectorResponseDTO(Long directorId, String directorName, Integer directorBirth, String directorPhoto) {
+        public DirectorResponseDTO(Long directorId, String directorName, Integer directorBirth, List<PhotoResponseDTO> directorPhoto) {
             this.directorId = directorId;
             this.directorName = directorName;
             this.directorBirth = directorBirth;
@@ -52,11 +62,18 @@ public class MovieInfoResponseDTO {
         }
 
         public static DirectorResponseDTO fromEntity(DirectorsEntity director) {
+            if (director == null) {
+                return null;
+            }
+            List<PhotoResponseDTO> photos = director.getDirectorPhotos().stream()
+                    .map(photoEntity -> PhotoResponseDTO.fromEntity(photoEntity.getPhotos()))
+                    .collect(Collectors.toList());
+
             return DirectorResponseDTO.builder()
                     .directorId(director.getDirectorId())
                     .directorName(director.getDirectorName())
                     .directorBirth(director.getDirectorBirth())
-                    .directorPhoto(director.getDirectorPhotos().toString())
+                    .directorPhoto(photos)
                     .build();
         }
     }
@@ -74,6 +91,9 @@ public class MovieInfoResponseDTO {
         }
 
         public static GenreResponseDTO fromEntity(GenresEntity genres) {
+            if (genres == null) {
+                return null;
+            }
             return GenreResponseDTO.builder()
                     .genreId(genres.getGenreId())
                     .genreName(genres.getGenreName())
@@ -94,6 +114,9 @@ public class MovieInfoResponseDTO {
         }
 
         public static PosterResponseDTO fromEntity(PostersEntity poster) {
+            if (poster == null) {
+                return null;
+            }
             return PosterResponseDTO.builder()
                     .posterId(poster.getPosterId())
                     .posterUrls(poster.getPosterUrls())
@@ -114,6 +137,9 @@ public class MovieInfoResponseDTO {
         }
 
         public static TrailerResponseDTO fromEntity(TrailersEntity trailer) {
+            if (trailer == null) {
+                return null;
+            }
             return TrailerResponseDTO.builder()
                     .trailerId(trailer.getTrailerId())
                     .trailerUrls(trailer.getTrailerUrls())
@@ -134,6 +160,9 @@ public class MovieInfoResponseDTO {
         }
 
         public static FilmResponseDTO fromEntity(MovieFilmEntity movieFilm) {
+            if (movieFilm == null) {
+                return null;
+            }
             return FilmResponseDTO.builder()
                     .filmId(movieFilm.getFilmId())
                     .movieFilm(movieFilm.getMovieFilm())
@@ -154,9 +183,12 @@ public class MovieInfoResponseDTO {
         }
 
         public static PhotoResponseDTO fromEntity(PhotosEntity photos) {
+            if (photos == null) {
+                return null;
+            }
             return PhotoResponseDTO.builder()
                     .photoId(photos.getPhotoId())
-                    .photoUrl(photos.getPhotoUrls())
+                    .photoUrl(photos.getPhotoUrls()) // photos.getPhotoUrls() -> photos.getPhotoUrl()로 변경
                     .build();
         }
     }
@@ -174,6 +206,9 @@ public class MovieInfoResponseDTO {
         }
 
         public static ActorsPhotosResponseDTO fromEntity(ActorsPhotosEntity actorsPhotos) {
+            if (actorsPhotos == null) {
+                return null;
+            }
             return ActorsPhotosResponseDTO.builder()
                     .photos(actorsPhotos.getPhotos())
                     .actors(actorsPhotos.getActor())
@@ -194,12 +229,13 @@ public class MovieInfoResponseDTO {
         }
 
         public static DirectorsPhotosResponseDTO fromEntity(DirectorsPhotosEntity directorsPhotos) {
+            if (directorsPhotos == null) {
+                return null;
+            }
             return DirectorsPhotosResponseDTO.builder()
                     .photos(directorsPhotos.getPhotos())
                     .directors(directorsPhotos.getDirector())
                     .build();
         }
     }
-
-
 }
