@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/user/movies") // USER와 ADMIN 모두 접근 가능
+@RequestMapping("/user") // USER와 ADMIN 모두 접근 가능
 @RequiredArgsConstructor
 public class MovieDetailController {
 

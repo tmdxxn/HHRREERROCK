@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-import '../../../../../../../../../../Users/tmdxxn/Downloads/HRERock_Movie/HRERock_Movie/Rock-master/src/main/frontend/src/common/css/MoviePage.css';
+import '../../common/css/MoviePage.css';
 
 function MoviePage() {
     const [movieDetail, setMovieDetail] = useState(null);
