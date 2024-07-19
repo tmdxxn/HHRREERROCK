@@ -267,6 +267,7 @@ public class AuthController {
         }
     }
 
+    // 비밀번호 인증
     @PostMapping("/verify-password")
     public ResponseEntity<?> verifyPassword(Authentication authentication, @RequestBody PasswordVerificationRequest request) {
         if (authentication == null) {

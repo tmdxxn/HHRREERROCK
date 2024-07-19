@@ -28,6 +28,7 @@ public class AdminMemberController {
     @Autowired
     private MemberService memberService;
 
+    // 회원 리스트
     @GetMapping("/members")
     public ResponseEntity<Page<MemberListDTO>> getAllMembers(
             @RequestParam(defaultValue = "0") int page,
@@ -38,6 +39,7 @@ public class AdminMemberController {
         return ResponseEntity.ok(memberDTOs);
     }
 
+    // 회원 검색
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/members/search")
     public ResponseEntity<List<MemberListDTO>> searchMembers(@RequestParam String term) {
@@ -52,44 +54,7 @@ public class AdminMemberController {
         return ResponseEntity.ok(memberDTOs);
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @PostMapping("/members/delete")
-//    public ResponseEntity<?> deleteMultipleMembers(@RequestBody List<String> memIds, Authentication authentication) {
-//        List<String> adminIds = new ArrayList<>();
-//        List<String> nonAdminIds = new ArrayList<>();
-//
-//        for (String memId : memIds) {
-//            if (memberService.isAdminMember(memId)) {
-//                adminIds.add(memId);
-//            } else {
-//                nonAdminIds.add(memId);
-//            }
-//        }
-//
-//        if (!adminIds.isEmpty()) {
-//            String message = "관리자 권한을 가진 회원 " + String.join(", ", adminIds) + "는 삭제할 수 없습니다.";
-//            if (!nonAdminIds.isEmpty()) {
-//                message += " 나머지 회원들은 삭제되었습니다.";
-//            }
-//            try {
-//                memberService.deleteMultipleMembers(nonAdminIds);
-//                return ResponseEntity.ok(message);
-//            } catch (Exception e) {
-//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                        .body(message + " 그러나 일반 회원 삭제 중 오류가 발생했습니다: " + e.getMessage());
-//            }
-//        } else {
-//            try {
-//                memberService.deleteMultipleMembers(memIds);
-//                return ResponseEntity.ok("선택한 회원들이 성공적으로 삭제되었습니다.");
-//            } catch (Exception e) {
-//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                        .body("회원 삭제 중 오류 발생: " + e.getMessage());
-//            }
-//        }
-//    }
-
-
+    // 회원 삭제
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/members/delete")
     public ResponseEntity<?> deleteMultipleMembers(@RequestBody List<String> memIds, Authentication authentication) {
