@@ -14,6 +14,8 @@ function AdminMemberListPage() {
     
     const [selectedMembers, setSelectedMembers] = useState([]);
 
+    const [selectAll, setSelectAll] = useState(false);
+
     useEffect(() => {
         fetchMembers();
     }, [currentPage]);
@@ -40,11 +42,27 @@ function AdminMemberListPage() {
         }
     };
 
-    // 체크박스 상태 변경
+    // 전체 선택 체크박스 핸들러
+    const handleSelectAll = (e) => {
+        const checked = e.target.checked;
+        setSelectAll(checked);
+        if (checked) {
+            setSelectedMembers(members.map(member => member.memNum));
+        } else {
+            setSelectedMembers([]);
+        }
+    };
+
+    // 개별 체크박스 핸들러
     const handleCheckboxChange = (memNum) => {
-        setSelectedMembers(prev =>
-            prev.includes(memNum) ? prev.filter(id => id !== memNum) : [...prev, memNum]
-        );
+        setSelectedMembers(prev => {
+            const newSelection = prev.includes(memNum)
+                ? prev.filter(id => id !== memNum)
+                : [...prev, memNum];
+
+            setSelectAll(newSelection.length === members.length);
+            return newSelection;
+        });
     };
 
     // 회원 탈퇴 로직
@@ -71,8 +89,10 @@ function AdminMemberListPage() {
                     alert(response.data);
                 }
 
-                fetchMembers();
+                // 회원 목록을 다시 불러오고, 선택 상태 초기화
+                await fetchMembers();
                 setSelectedMembers([]);
+                setSelectAll(false);  // 전체 선택 상태도 해제
             } catch (error) {
                 console.error("회원 삭제 중 오류 발생:", error.response?.data || error.message);
                 alert(`회원 삭제 중 오류가 발생했습니다: ${error.response?.data || error.message}`);
@@ -89,13 +109,21 @@ function AdminMemberListPage() {
                 <div className="admin_member_list">
                     <div>
                         <ul className="list content">
-                            <li className="checkbox"></li>
+                            <li className="checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={selectAll}
+                                    onChange={handleSelectAll}
+                                />
+                            </li>
                             <li className="mem_no">회원 번호</li>
                             <li className="mem_id">회원 ID</li>
+                            <li className="mem_name">이름</li>
                             <li className="mem_email">이메일</li>
                             <li className="mem_phone">연락처</li>
                             <li className="mem_gender">성별</li>
                             <li className="mem_birth">생년월일</li>
+                            <li className="mem_role">권한</li>
                         </ul>
                     </div>
                     <div>
@@ -110,10 +138,12 @@ function AdminMemberListPage() {
                                 </li>
                                 <li className="mem_no">{member.memNum}</li>
                                 <li className="mem_id">{member.memId}</li>
+                                <li className="mem_name">{member.memName}</li>
                                 <li className="mem_email">{member.memEmail}</li>
                                 <li className="mem_phone">{member.memTel}</li>
                                 <li className="mem_gender">{member.memGender}</li>
                                 <li className="mem_birth">{member.memBirth}</li>
+                                <li className="mem_role">{member.memRole}</li>
                             </ul>
                         ))}
                     </div>
