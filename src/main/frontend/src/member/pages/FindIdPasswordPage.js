@@ -19,14 +19,17 @@ function FindIdPassword() {
 
     const [message, setMessage] = useState('');
 
+    // 아이디 찾기 폼 관련
     const handleFindIdChange = (e) => {
         setFindIdForm({ ...findIdForm, [e.target.name]: e.target.value });
     };
 
+    // 비밀번호 찾기 폼 관련
     const handleFindPasswordChange = (e) => {
         setFindPasswordForm({ ...findPasswordForm, [e.target.name]: e.target.value });
     };
 
+    // 아이디 찾기 로직
     const handleFindId = async (e) => {
         e.preventDefault();
 
@@ -38,6 +41,7 @@ function FindIdPassword() {
         }
     };
 
+    // 비밀번호 찾기 로직
     const handleFindPassword = async (e) => {
         e.preventDefault();
         try {

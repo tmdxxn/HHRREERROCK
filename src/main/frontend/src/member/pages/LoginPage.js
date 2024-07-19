@@ -11,12 +11,14 @@ function LoginPage() {
     useEffect(() => {
         const form = document.getElementById('login-form');
 
+        // 폼 요소 가져옴
         const handleSubmit = async (e) => {
             e.preventDefault();
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
+            // 로그인 요청
             const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {
@@ -28,8 +30,11 @@ function LoginPage() {
                 })
             });
 
+            // 응답 처리
             if (response.ok) {
                 const data = await response.json();
+
+                // 로컬스토리지 토큰 & 메서드 저장
                 localStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('loginMethod', 'custom');
                 navigate('/')
@@ -45,6 +50,7 @@ function LoginPage() {
         };
     }, []);
 
+    // 구글로그인 로직
     const handleGoogleLogin = () => {
         window.location.href = 'http://localhost:8080/oauth2/authorization/google';
     };
