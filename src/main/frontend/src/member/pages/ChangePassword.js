@@ -6,15 +6,21 @@ import axios from "axios";
 import "../../common/css/ChangePassword.css"
 
 function ChangePassword() {
+
     const navigate = useNavigate();
+
     const location = useLocation();
+
     const [isResetMode, setIsResetMode] = useState(false);
+
     const [passwords, setPasswords] = useState({
         memNewPassword: '',
         memNewPasswordCheck: ''
     });
+
     const [passwordError, setPasswordError] = useState('');
 
+    // URL 확인 후 모드 변경
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const tokenParam = params.get('token');
@@ -25,6 +31,7 @@ function ChangePassword() {
         }
     }, [location, navigate]);
 
+    // 비밀번호 유효성 검사 조건
     const validatePassword = (password) => {
         const minLength = 8;
         const hasUpperCase = /[A-Z]/.test(password);
@@ -40,6 +47,7 @@ function ChangePassword() {
         return '';
     };
 
+    // 필드 값 변경 될 시 호출
     const handleChange = (e) => {
         const { name, value } = e.target;
         setPasswords(prevState => ({
@@ -51,14 +59,17 @@ function ChangePassword() {
         }
     };
 
+    // 폼 제출 시 호출
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // 비밀번호 검사
         if (passwordError) {
             alert(passwordError);
             return;
         }
 
+        // 일치 여부 검사
         if (passwords.memNewPassword !== passwords.memNewPasswordCheck) {
             alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
             return;
@@ -71,6 +82,7 @@ function ChangePassword() {
                 memNewPasswordCheck: passwords.memNewPasswordCheck
             };
 
+            // 재설정 & 변경 모드 엔드포인트
             if (isResetMode) {
                 const token = sessionStorage.getItem('resetToken');
                 response = await axios.post('/auth/reset-password',
@@ -85,6 +97,7 @@ function ChangePassword() {
                 });
             }
 
+            // 비밀번호 변경시 알림, 이동
             if (response.status === 200) {
                 alert('비밀번호가 성공적으로 변경되었습니다.');
                 navigate(isResetMode ? '/login' : -1);
@@ -120,6 +133,7 @@ function ChangePassword() {
                         </div>
                     </div>
 
+                    {/* 비밀번호 오류 메시지 */}
                     {passwordError && <div className="error-message">{passwordError}</div>}
 
                     <div className="change_password">
@@ -149,6 +163,7 @@ function ChangePassword() {
                 </form>
             </div>
 
+            {/* 변경 모드일 때만 돌아가는 버튼있음 */}
             {!isResetMode && (
                 <div className="return_button">
                     <button className="ReturnBtn"

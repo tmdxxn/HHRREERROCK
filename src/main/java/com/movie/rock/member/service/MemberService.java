@@ -7,6 +7,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,17 +38,8 @@ public class MemberService {
     @Autowired
     private EmailVerificationService emailVerificationService;
 
-    // 아이디와 이메일로 회원 찾기
-    public MemberEntity findMemberByUsernameAndEmail(String memId, String memEmail) {
-        return memberRepository.findByMemIdAndMemEmail(memId, memEmail)
-                .orElse(null);
-    }
+    // 회원 가입 ------------------------------------------------------------------
     
-    // 이메일로 회원 찾기
-    public Optional<MemberEntity> findByEmail(String memEmail) {
-        return memberRepository.findByMemEmail(memEmail);
-    }
-
     // 회원가입 이메일 인증 발송
     public void sendSignUpVerificationEmail(String memEmail) throws Exception {
         if (memberRepository.findByMemEmail(memEmail).isPresent()) {
@@ -87,6 +81,8 @@ public class MemberService {
         memberRepository.save(newMember);
     }
 
+    // 중복 체크 ------------------------------------------------------------------
+    
     // 아이디 중복 확인
     public boolean isUsernameExists(String memId) {
         return memberRepository.findByMemId(memId).isPresent();
@@ -97,6 +93,8 @@ public class MemberService {
         return memberRepository.findByMemEmail(memEmail).isPresent();
     }
 
+    // 회원 탈퇴 ------------------------------------------------------------------
+    
     // 회원탈퇴
     @Transactional
     public void delete(String memId) throws Exception {
@@ -121,6 +119,8 @@ public class MemberService {
         }
     }
 
+    // 정보 수정 ------------------------------------------------------------------
+    
     // 회원 정보 수정
     @Transactional
     public void updateMember(String memId, UpdateMemberDTO updateDto) {
@@ -148,15 +148,14 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    // 아이디 찾기 -----------------------------------------------------------------
+
     // 아이디 찾기 로직
     public Optional<MemberEntity> findMemId(String memEmail, String memName) {
         return memberRepository.findByMemEmailAndMemName(memEmail, memName);
     }
 
-    // 헤더에 정보를 넣기 위한 메서드
-    public MemberEntity findByMemId(String memId) {
-        return memberRepository.findByMemId(memId).orElse(null);
-    }
+    // 비밀번호 찾기 ----------------------------------------------------------------
 
     // 비밀번호 재설정 토큰 생성
     @Transactional
@@ -224,10 +223,44 @@ public class MemberService {
         }
     }
 
-    // 비밀번호 재설정 토큰으로 회원 조회
+    // 비밀번호 재설정 토큰으로 회원 찾기
     public Optional<MemberEntity> getMemberByPasswordResetToken(String token) {
         return passwordResetTokenRepository.findByToken(token)
                 .map(PasswordResetTokenEntity::getMember);
+    }
+
+    // 회원 검증 -----------------------------------------------------------------
+
+    // 아이디로 회원 찾기
+    public MemberEntity findByMemId(String memId) {
+        return memberRepository.findByMemId(memId).orElse(null);
+    }
+
+    // 아이디와 이메일로 회원 찾기
+    public MemberEntity findMemberByUsernameAndEmail(String memId, String memEmail) {
+        return memberRepository.findByMemIdAndMemEmail(memId, memEmail)
+                .orElse(null);
+    }
+
+    // 이메일로 회원 찾기
+    public Optional<MemberEntity> findByEmail(String memEmail) {
+        return memberRepository.findByMemEmail(memEmail);
+    }
+
+    // 권한 확인
+    public boolean isAdminMember(String memId) {
+        Optional<MemberEntity> member = memberRepository.findByMemId(memId);
+        return member.map(m -> m.getMemRole() == RoleEnum.ADMIN).orElse(false);
+    }
+
+    // 관리자) 회원 전체 조회 ----------------------------------------------
+
+    public List<MemberEntity> getAllMembers() {
+        return memberRepository.findAll(Sort.by(Sort.Direction.ASC, "memNum"));
+    }
+
+    public Page<MemberEntity> getAllMembersPageable(Pageable pageable) {
+        return memberRepository.findAll(pageable);
     }
 
 }

@@ -44,7 +44,7 @@ function SignUp() {
         return '';
     };
 
-    // 유효성 검사
+    // 입력값 변경될때
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => {

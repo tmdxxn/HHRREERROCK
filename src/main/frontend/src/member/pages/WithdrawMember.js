@@ -14,6 +14,7 @@ function WithdrawMember() {
         setMemPassword(e.target.value);
     };
 
+    // 비밀번호 확인
     const verifyPassword = async () => {
         try {
             const response = await axios.post('/auth/verify-password', { memPassword }, {
@@ -26,6 +27,7 @@ function WithdrawMember() {
         }
     };
 
+    // 탈퇴 버튼 클릭시
     const handleWithdraw = async () => {
         const isPasswordCorrect = await verifyPassword();
         if (!isPasswordCorrect) {
@@ -36,6 +38,7 @@ function WithdrawMember() {
         setModal(true);
     };
 
+    // 탈퇴 처리 함수
     const confirmWithdraw = async () => {
         try {
             const response = await axios.delete('/auth/delete', {
