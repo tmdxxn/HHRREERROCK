@@ -1,178 +1,280 @@
-import React from "react";
-import {Link, useNavigate} from "react-router-dom";
-
+import React, {useState, useEffect, useCallback, useRef} from "react";
+import { useNavigate } from "react-router-dom";
 import '../../../common/css/AdminMovieList.css';
+import axios from "axios";
 
 function AdminMovieListPage() {
+    const [movies, setMovies] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchType, setSearchType] = useState("title");
+    const [isSearchActive, setIsSearchActive] = useState(false);
+    const [selectedMovies, setSelectedMovies] = useState([]);
 
-    const adminMovieInfo = [
-        {
-            movieId : "1234567890",
-            movieTitle: "qwertyuiopasdfghjklzxcvbnm",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "1",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "2",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "3",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "4",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "5",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "6",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "7",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "8",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-        {
-            movieId : "9",
-            movieTitle: "반지의 제왕",
-            movieGenre: "판타지",
-            movieDirector: "피터 잭슨",
-            moviePlayTime: "120분",
-        },
-
-
-    ]
+    //관리자 권한 인증 확인
+    const initializedRef = useRef(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasPermission, setHasPermission] = useState(false);
 
     const navigate = useNavigate();
 
+    const pageGroupSize = 10;
+
+    //인증
+    const checkPermission = useCallback(async () => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            navigate('/login');
+            return;
+        }
+
+        try {
+            const response = await axios.get('/auth/memberinfo', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const role = response.data.memRole;
+            if (role === 'ADMIN') {
+                setHasPermission(true);
+            } else {
+                alert("권한이 없습니다.");
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Error fetching user info:', error);
+            alert("오류가 발생했습니다. 다시 로그인해주세요.");
+            navigate('/login');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        if (!initializedRef.current) {
+            initializedRef.current = true;
+            checkPermission();
+        }
+    }, [checkPermission]);
+
+    const fetchMovies = useCallback(async (page = currentPage) => {
+        try {
+            let url;
+            if (isSearchActive && searchTerm) {
+                const params = new URLSearchParams({
+                    page: page.toString(),
+                    size: '10',
+                    sort: 'movieId,asc',
+                    movieTitle: '',
+                    movieGenres: '',
+                    directorName: ''
+                });
+                switch(searchType) {
+                    case "title":
+                        params.set("movieTitle", searchTerm);
+                        break;
+                    case "genre":
+                        params.set("movieGenres", searchTerm);
+                        break;
+                    case "director":
+                        params.set("directorName", searchTerm);
+                        break;
+                    default:
+                        params.set("movieTitle", searchTerm);
+                }
+                url = `/admin/movie/list/search?${params}`;
+            } else {
+                url = `/admin/movie/movielist?page=${page}&size=10&sort=movieId,asc`;
+            }
+
+            console.log("Fetching URL:", url);
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Network response was not ok: ${errorText}`);
+            }
+            const data = await response.json();
+            console.log("Fetched data:", data);
+            setMovies(data.content);
+            setTotalPages(data.totalPages);
+        } catch (error) {
+            console.error("영화 데이터를 가져오는 데 실패했습니다:", error);
+        }
+    }, [currentPage, isSearchActive, searchTerm, searchType]);
+
+    useEffect(() => {
+        if (!isSearchActive) {
+            fetchMovies();
+        }
+    }, [fetchMovies, isSearchActive]);
+
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        setIsSearchActive(true);
+        setCurrentPage(0);
+        await fetchMovies(0);
+    };
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        fetchMovies(newPage);
+    };
+
+    const handleAddMovie = () => navigate("/admin/MovieUpload");
+    const handleEditMovie = (movieId) => navigate(`/admin/movie/${movieId}/modify`);
+    const handleDeleteMovie = async () => {
+        if (selectedMovies.length === 0) {
+            alert("삭제할 영화를 선택해주세요.");
+            return;
+        }
+
+        if (window.confirm("선택한 영화를 삭제하시겠습니까?")) {
+            try {
+                const response = await fetch(`/admin/movie/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(selectedMovies)
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                alert("선택한 영화가 삭제되었습니다.");
+                setSelectedMovies([]);
+                fetchMovies(currentPage);
+            } catch (error) {
+                console.error("영화 삭제에 실패했습니다:", error);
+                alert("영화 삭제에 실패했습니다.");
+            }
+        }
+    };
+    const resetSearch = () => {
+        setIsSearchActive(false);
+        setSearchTerm("");
+        setSearchType("title");
+        setCurrentPage(0);
+        fetchMovies(0);
+    };
+
+    const handleCheckboxChange = (movieId) => {
+        setSelectedMovies(prev =>
+            prev.includes(movieId)
+                ? prev.filter(id => id !== movieId)
+                : [...prev, movieId]
+        );
+    };
+
+    const renderPagination = () => {
+        const currentGroup = Math.floor(currentPage / pageGroupSize);
+        const startPage = currentGroup * pageGroupSize;
+        const endPage = Math.min(startPage + pageGroupSize, totalPages);
+
+        const pages = [];
+
+        if (currentGroup > 0) {
+            pages.push(
+                <button key="prev" onClick={() => handlePageChange(startPage - 1)}>
+                    &lt;
+                </button>
+            );
+        }
+
+        for (let i = startPage; i < endPage; i++) {
+            pages.push(
+                <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={currentPage === i ? 'active' : ''}
+                >
+                    {i + 1}
+                </button>
+            );
+        }
+
+        if (endPage < totalPages) {
+            pages.push(
+                <button key="next" onClick={() => handlePageChange(endPage)}>
+                    &gt;
+                </button>
+            );
+        }
+
+        return pages;
+    };
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!hasPermission) {
+        return <div>접근 권한이 없습니다.</div>;
+    }
 
     return (
-        <>
-            <div className="list_div">
-                <div className="admin_movie_haed">
-                    <h2>영화 관리</h2>
-                </div>
-                <div className="admin_movie_list">
-                    <div>
-                        <ul className="list content">
-                            {/* <!-- 리스트 구획 설명 --> */}
-
-
-                            <li className="checkbox">  {/* <!-- 체크 박스를 위한 빈 공간-->*/} </li>
-                            <li className="movie_id">영화 ID</li>
-                            <li className="movie_title">영화 이름</li>
-                            <li className="movie_genre">영화 장르</li>
-                            <li className="movie_director">영화 감독</li>
-                            <li className="movie_time">영화 시간</li>
-                        </ul>
-                    </div>
-                    <div>
-                        {/* <!-- 영화 리스트 --> */}
-                        {adminMovieInfo.map((movieinfo, index) => (
-                        <ul className="list " key={index}>
-                            <li className="checkbox"><input type="checkbox" name="" id="" /></li>
-                            <li className="movie_id">{movieinfo.movieId}</li>
-                            <li className="movie_title"><Link to="/admin/MovieUpload" className="black">{movieinfo.movieTitle}</Link></li>
-                            <li className="movie_genre">{movieinfo.movieGenre}</li>
-                            <li className="movie_director">{movieinfo.movieDirector}</li>
-                            <li className="movie_time">{movieinfo.moviePlayTime}</li>
-                        </ul>
-
-                        ))}
-                    </div>
-                </div>
-
-                {/* <!-- ======================== 리스트 페이지 ===================== --> */}
-                <div className="list_number">
-                    <ul className="list_number_ul">
-                        <li id="">&lt;</li>
-                        <li id="">1</li>
-                        <li id="">2</li>
-                        <li id="">3</li>
-                        <li id="">4</li>
-                        <li id="">5</li>
-                        <li id="">6</li>
-                        <li id="">7</li>
-                        <li id="">8</li>
-                        <li id="">9</li>
-                        <li id="">10</li>
-                        <li id="">&gt;</li>
-                    </ul>
-                </div>
-                {/* <!-- ======================= 영화 검색 ========================= --> */}
-                <div className="admmin_movie_search_div">
-                    <div className="movie_search_form">
-                        <form action="">
-                            {/* <!-- 영화 검색 --> */}
-                            <input type="text" name="" id="" placeholder="영화 검색" />
-                            <input type="submit" name="" id="" value="검색" />
-                        </form>
-
-                    </div>
-                    <div className="movie_edit_btn">
-                        {/* <!-- 영화 추가/삭제 버튼 --> */}
-                        <button className="add_movie" onClick={() => navigate("/admin/MovieUpload")}>영화 추가</button>
-                        <button className="change_movie" onClick={() => navigate("/admin/MovieUpload")}>영화 수정</button>
-                        <button className="delete_movie">영화 삭제</button>
-                    </div>
-
-                </div>
+        <div className="list_div">
+            <div className="admin_movie_head">
+                <h2>영화 관리</h2>
             </div>
-
-
-
-
-
-        </>
-
+            <div className="admin_movie_search_div">
+                <form onSubmit={handleSearch}>
+                    <select
+                        value={searchType}
+                        onChange={(e) => setSearchType(e.target.value)}
+                    >
+                        <option value="title">제목</option>
+                        <option value="genre">장르</option>
+                        <option value="director">감독</option>
+                    </select>
+                    <input
+                        type="text"
+                        placeholder="검색어 입력"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button type="submit">검색</button>
+                </form>
+                <button onClick={resetSearch}>검색 초기화</button>
+            </div>
+            <div className="admin_movie_list">
+                <ul className="list content">
+                    <li className="checkbox"></li>
+                    <li className="movie_id">영화 ID</li>
+                    <li className="movie_title">영화 이름</li>
+                    <li className="movie_genre">영화 장르</li>
+                    <li className="movie_director">영화 감독</li>
+                    <li className="movie_time">영화 시간</li>
+                </ul>
+                {movies.map((movie, index) => (
+                    <ul className="list" key={index}>
+                        <li className="checkbox">
+                            <input
+                                type="checkbox"
+                                checked={selectedMovies.includes(movie.movieId)}
+                                onChange={() => handleCheckboxChange(movie.movieId)}
+                            />
+                        </li>
+                        <li className="movie_id">{movie.movieId}</li>
+                        <li className="movie_title">{movie.movieTitle}</li>
+                        <li className="movie_genre">{movie.genres}</li>
+                        <li className="movie_director">{movie.directors}</li>
+                        <li className="movie_time">{movie.runtime}</li>
+                        <li>
+                            <button onClick={() => handleEditMovie(movie.movieId)}>수정</button>
+                        </li>
+                    </ul>
+                ))}
+            </div>
+            <div className="list_number">
+                {renderPagination()}
+            </div>
+            <div className="movie_edit_btn">
+                <button onClick={handleAddMovie}>영화 추가</button>
+                <button onClick={handleDeleteMovie}>영화 삭제</button>
+            </div>
+        </div>
     );
-
 }
-
-
-
-
-
-
-
-
-
 
 export default AdminMovieListPage;

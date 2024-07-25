@@ -28,8 +28,10 @@ import NoticeWritetPage from "./administrator/notice/pages/NoticeWritePage";
 import AdminNoticeListPage from "./administrator/admin/pages/AdminNoticeListPage";
 import AdminMovieListPage from "./administrator/admin/pages/AdminMovieListPage";
 import AdminMovieUploadPage from "./administrator/admin/pages/AdminMovieUploadPage";
+import AdminMovieUploadModifyPage from "./administrator/admin/pages/AdminMovieUploadModifyPage";
 import AdminMemberListPage from "./administrator/admin/pages/AdminMemberListPage";
 import AdminMovieUploadFilePage from './administrator/admin/pages/AdminMovieUploadFilePage';
+import AdminMovieUploadFileModifyPage from './administrator/admin/pages/AdminMovieUploadFileModifyPage';
 import MoviePlayPage from './movie/pages/MoviePlayPage';
 
 
@@ -50,13 +52,15 @@ function App() {
                     <Route path='/admin/Notice/Write' element={<NoticeWritetPage />}  />
 
                 </Route>
-                
+
                 <Route element={<AdminOutlet />} >
                     {/* admin header 공유 페이지 */}
                     <Route path="/admin/Notice" element={<AdminNoticeListPage  />}  />
                     <Route path="admin/MovieList" element={<AdminMovieListPage  />}  />
-                    <Route path="admin/MovieUpload" element={<AdminMovieUploadPage  />}  />
-                    <Route path="admin/MovieUploadFile" element={<AdminMovieUploadFilePage  />}  />
+                    <Route path="/admin/MovieUpload" element={<AdminMovieUploadPage  />}  />
+                    <Route path="/admin/movie/:movieId/modify" element={<AdminMovieUploadModifyPage />} />
+                    <Route path="/admin/MovieUploadFile" element={<AdminMovieUploadFilePage  />}  />
+                    <Route path="/admin/movie/:movieId/modify2" element={<AdminMovieUploadFileModifyPage />} />
                     <Route path="admin/MemberList" element={<AdminMemberListPage  />}  />
                 </Route>
                 

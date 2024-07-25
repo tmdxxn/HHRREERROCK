@@ -16,6 +16,7 @@ public class MovieReviewPageResponseDTO {
     private int totalPages;
     private boolean hasPrevious;
     private boolean hasNext;
+    private List<Integer> pageNumbers;
     private long totalReviews;
     private double averageRating;
 }

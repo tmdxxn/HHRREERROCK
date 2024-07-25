@@ -18,4 +18,5 @@ public interface MovieReviewService {
     Long getTotalReviews(Long movieId);
 
     double getAverageRating(Long movieId);
+
 }

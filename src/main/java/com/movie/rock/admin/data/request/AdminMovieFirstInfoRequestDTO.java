@@ -1,51 +1,38 @@
 package com.movie.rock.admin.data.request;
 
-
 import com.movie.rock.movie.data.entity.*;
 import com.movie.rock.movie.data.response.MovieInfoResponseDTO.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AdminMovieFirstInfoRequestDTO {
     private Long movieId;
-    private String movieTitle;
-    private List<GenreResponseDTO> movieGenres;
+    private String movieTitle;  // 추가
+    private List<GenreResponseDTO> movieGenres = new ArrayList<>();
     private int runTime;
     private Integer openYear;
     private String movieRating;
     private String movieDescription;
-    private List<ActorResponseDTO> movieActors;
-    //배우사진 추가
-    private List<DirectorResponseDTO> movieDirectors;
-    //감독사진 추가
+    private List<ActorResponseDTO> movieActors = new ArrayList<>();
+    private List<DirectorResponseDTO> movieDirectors = new ArrayList<>();
 
-    //생성자
-    public AdminMovieFirstInfoRequestDTO(Long movieId,String movieTitle,List<GenreResponseDTO> movieGenres
-            ,int runTime,Integer openYear,String movieRating,String movieDescription,List<ActorResponseDTO> movieActors,List<DirectorResponseDTO> movieDirectors){
-        this.movieId = movieId;
-        this.movieTitle = movieTitle;
-        this.movieGenres = movieGenres;
-        this.runTime = runTime;
-        this.openYear = openYear;
-        this.movieRating = movieRating;
-        this.movieDescription = movieDescription;
-        this.movieActors = movieActors;
-        this.movieDirectors = movieDirectors;
-    }
 
-    //생성자에 넣을 데이터
-    @Builder
-    public static MovieEntity ofEntity(AdminMovieFirstInfoRequestDTO adminMovieFirstInfoRequestDTO){
+    // 생성자에 넣을 데이터
+    public static MovieEntity ofEntity(AdminMovieFirstInfoRequestDTO dto) {
         return MovieEntity.builder()
-                .movieId(adminMovieFirstInfoRequestDTO.getMovieId())
-                .movieTitle(adminMovieFirstInfoRequestDTO.getMovieTitle())
-                .genres(adminMovieFirstInfoRequestDTO.getMovieGenres().stream()
+                .movieId(dto.getMovieId())
+                .movieTitle(dto.getMovieTitle())
+                .genres(dto.getMovieGenres().stream()
                         .map(genreDto -> MovieGenresEntity.builder()
                                 .genre(GenresEntity.builder()
                                         .genreId(genreDto.getGenreId())
@@ -53,11 +40,11 @@ public class AdminMovieFirstInfoRequestDTO {
                                         .build())
                                 .build())
                         .collect(Collectors.toList()))
-                .runTime(adminMovieFirstInfoRequestDTO.getRunTime())
-                .openYear(adminMovieFirstInfoRequestDTO.getOpenYear())
-                .movieRating(adminMovieFirstInfoRequestDTO.getMovieRating())
-                .movieDescription(adminMovieFirstInfoRequestDTO.getMovieDescription())
-                .movieActors(adminMovieFirstInfoRequestDTO.getMovieActors().stream()
+                .runTime(dto.getRunTime())
+                .openYear(dto.getOpenYear())
+                .movieRating(dto.getMovieRating())
+                .movieDescription(dto.getMovieDescription())
+                .movieActors(dto.getMovieActors().stream()
                         .map(movieActorDto -> MovieActorsEntity.builder()
                                 .actor(ActorsEntity.builder()
                                         .actorId(movieActorDto.getActorId())
@@ -65,7 +52,7 @@ public class AdminMovieFirstInfoRequestDTO {
                                         .build())
                                 .build())
                         .collect(Collectors.toList()))
-                .movieDirectors(adminMovieFirstInfoRequestDTO.getMovieDirectors().stream()
+                .movieDirectors(dto.getMovieDirectors().stream()
                         .map(movieDirectorDto -> MovieDirectorsEntity.builder()
                                 .director(DirectorsEntity.builder()
                                         .directorId(movieDirectorDto.getDirectorId())
@@ -75,6 +62,6 @@ public class AdminMovieFirstInfoRequestDTO {
                         .collect(Collectors.toList())
                 )
                 .build();
-
     }
+
 }

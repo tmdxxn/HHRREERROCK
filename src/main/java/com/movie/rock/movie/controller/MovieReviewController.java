@@ -7,6 +7,7 @@ import com.movie.rock.movie.data.request.MovieReviewRequestDTO;
 import com.movie.rock.movie.data.response.MovieReviewPageResponseDTO;
 import com.movie.rock.movie.data.response.MovieReviewResponseDTO;
 import com.movie.rock.movie.service.MovieReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +15,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/movies/{movieId}/reviews")
+@RequestMapping("/user/movies/detail")
 @RequiredArgsConstructor
 public class MovieReviewController {
 
     private final MovieReviewService movieReviewService;
     private final MemberRepository memberRepository;
 
-    @GetMapping
+    @GetMapping("/{movieId}/reviews")
     public ResponseEntity<MovieReviewPageResponseDTO> getMovieReviews(
             @PathVariable("movieId") Long movieId,
             @RequestParam(defaultValue = "1") int page,
@@ -33,10 +34,10 @@ public class MovieReviewController {
         return ResponseEntity.ok(reviewPage);
     }
 
-    @PostMapping
+    @PostMapping("/{movieId}/reviews")
     public ResponseEntity<MovieReviewResponseDTO> createMovieReview(
             @PathVariable("movieId") Long movieId,
-            @RequestBody MovieReviewRequestDTO requestDTO,
+            @Valid @RequestBody MovieReviewRequestDTO requestDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         MemberEntity member = userDetails.memberEntity();
@@ -45,11 +46,11 @@ public class MovieReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
 
-    @PutMapping("/{reviewId}")
+    @PutMapping("/{movieId}/reviews/{reviewId}")
     public ResponseEntity<MovieReviewResponseDTO> updateMovieReview(
             @PathVariable("movieId") Long movieId,
             @PathVariable("reviewId") Long reviewId,
-            @RequestBody MovieReviewRequestDTO requestDTO,
+            @Valid @RequestBody MovieReviewRequestDTO requestDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         MemberEntity member = userDetails.memberEntity();
@@ -58,7 +59,7 @@ public class MovieReviewController {
         return ResponseEntity.ok(review);
     }
 
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping("/{movieId}/reviews/{reviewId}")
     public ResponseEntity<Void> deleteMovieReview(
             @PathVariable("movieId") Long movieId,
             @PathVariable("reviewId") Long reviewId,

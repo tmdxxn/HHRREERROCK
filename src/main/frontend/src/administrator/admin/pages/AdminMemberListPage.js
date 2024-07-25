@@ -14,9 +14,9 @@ function AdminMemberListPage() {
     return (
         <>
             <div className="list_div">
-            <div className="admin_member_haed">
-                <h2>회원 관리</h2>
-            </div>
+                <div className="admin_member_haed">
+                    <h2>회원 관리</h2>
+                </div>
                 <div className="admin_member_list">
                     <div>
                         <ul className="list content">

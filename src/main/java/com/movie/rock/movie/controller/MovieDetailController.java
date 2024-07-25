@@ -2,8 +2,13 @@ package com.movie.rock.movie.controller;
 
 import com.movie.rock.common.MovieException.UnauthorizedAccessException;
 import com.movie.rock.member.service.CustomUserDetails;
+import com.movie.rock.member.service.MemberService;
 import com.movie.rock.movie.data.response.MovieDetailResponseDTO;
+import com.movie.rock.movie.data.response.MovieFavorResponseDTO;
+import com.movie.rock.movie.data.response.MovieReviewPageResponseDTO;
 import com.movie.rock.movie.service.MovieDetailService;
+import com.movie.rock.movie.service.MovieFavorService;
+import com.movie.rock.movie.service.MovieReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,7 +44,7 @@ public class MovieDetailController {
 //            @RequestParam(defaultValue = "1") int page,
 //            @AuthenticationPrincipal CustomUserDetails userDetails) {
 //
-//        MovieReviewPageResponseDTO reviewPage = movieReviewService.getMovieReviews(movieId, page, userDetails.getMemberEntity());
+//        MovieReviewPageResponseDTO reviewPage = movieReviewService.getMovieReviews(movieId, page, userDetails.getMember());
 //        return ResponseEntity.ok(reviewPage);
 //    }
 //

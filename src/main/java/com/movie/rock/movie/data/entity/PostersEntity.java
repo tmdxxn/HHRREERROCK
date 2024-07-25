@@ -19,10 +19,6 @@ public class PostersEntity {
     @Column(name = "poster_url")
     private String posterUrls;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id", referencedColumnName = "movie_id")
-    private MovieEntity movie;
-
     @Builder
     public PostersEntity(Long posterId, String posterUrls) {
         this.posterId = posterId;

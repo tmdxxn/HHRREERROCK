@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 // component
 import RankingSlide from '../components/RankingSlide';
@@ -14,9 +15,9 @@ import "../../common/css/MainPage.css";
 
 function MainPage() {
 
-
-
     const initializedRef = useRef(false);
+    const navigate = useNavigate();
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (!initializedRef.current) {
@@ -111,6 +112,44 @@ function MainPage() {
             console.error('Error fetching member info:', error);
             document.getElementById('member-info').innerText = '오류가 발생했습니다: ' + error.message;
         }
+    }
+
+    const handleMovieClick = async (movieId) => {
+        const token = localStorage.getItem('accessToken');
+        if(!token) {
+            alert("접근권한이 없습니다.");
+            navigate('/login');
+        } else {
+            try {
+                await axios.get(`/movie/${movieId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                navigate(`/user/MoviePage/${movieId}`);
+            } catch (error) {
+                if (error.response) {
+                    switch (error.response.data.errCode) {
+                        case "ERR_UNAUTHORIZED":
+                            alert("접근 권한이 없습니다.");
+                            navigate('/login');
+                            break;
+
+                        case "ERR_R_RATED_MOVIE":
+                            alert("청소년 관람 불가 등급의 영화입니다.");
+                            break;
+
+                        case "ERR_MOVIE_NOT_FOUND":
+                            alert("영화를 찾을 수 없습니다.");
+                            break;
+
+                        default:
+                            alert("영화 정보를 불러오는 데 실패했습니다.")
+                    }
+                } else {
+                    alert("서버와의 연결에 실패했습니다.");
+                }
+            }
+        }
+
     }
 
 

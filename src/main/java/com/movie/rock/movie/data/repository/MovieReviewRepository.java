@@ -36,4 +36,8 @@ public interface MovieReviewRepository extends JpaRepository<MovieReviewEntity, 
     //영화 평점 평균
     @Query("SELECT AVG(r.reviewRating) FROM MovieReviewEntity r WHERE r.movie.movieId = :movieId")
     Double getAverageRatingForMovie(@Param("movieId") Long movieId);
+
+    @Query("SELECT r FROM MovieReviewEntity r WHERE r.movie.movieId = :movieId")
+    Page<MovieReviewEntity> findByMovieMovieId(@Param("movieId") Long movieId, Pageable pageable);
 }
+

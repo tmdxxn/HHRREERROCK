@@ -1,6 +1,5 @@
 package com.movie.rock.movie.service;
 
-import com.movie.rock.common.MovieException;
 import com.movie.rock.common.MovieException.MemberNotFoundException;
 import com.movie.rock.common.MovieException.MovieNotFoundException;
 import com.movie.rock.common.MovieException.PostersByMovieNotFoundException;
@@ -8,12 +7,10 @@ import com.movie.rock.member.data.MemberEntity;
 import com.movie.rock.member.data.MemberRepository;
 import com.movie.rock.movie.data.entity.MovieEntity;
 import com.movie.rock.movie.data.entity.MovieFavorEntity;
-import com.movie.rock.movie.data.entity.MoviePostersEntity;
 import com.movie.rock.movie.data.repository.MovieFavorRepository;
 import com.movie.rock.movie.data.repository.MoviePostersRepository;
 import com.movie.rock.movie.data.repository.MovieRepository;
 import com.movie.rock.movie.data.request.MovieFavorRequestDTO;
-import com.movie.rock.movie.data.response.MovieDetailResponseDTO;
 import com.movie.rock.movie.data.response.MovieFavorResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -80,15 +77,17 @@ public class MovieFavorServiceImpl implements MovieFavorService {
     @Override
     @Transactional(readOnly = true)
     public Long getTotalFavoritesCount(Long movieId) {
-        return movieFavorRepository.countByMovieMovieId(movieId);
+        Long count = movieFavorRepository.countByMovieMovieId(movieId);
+        log.info("Total favorites count for movie {}: {}", movieId, count);
+        return Math.max(0, count);
     }
 
     @Override
     public MovieFavorResponseDTO getFavoritesStatus(Long memNum, Long movieId) {
         MovieEntity movie = movieRepository.findByMovieId(movieId)
-                .orElseThrow(MovieException.MovieNotFoundException::new);
+                .orElseThrow(MovieNotFoundException::new);
         MemberEntity member = memberRepository.findByMemNum(memNum)
-                .orElseThrow(MovieException.MemberNotFoundException::new);
+                .orElseThrow(MemberNotFoundException::new);
         boolean isFavorite = isFavoritedBy(movieId, memNum);
         Long totalFavorCount = getTotalFavoritesCount(movieId);
 
@@ -106,5 +105,4 @@ public class MovieFavorServiceImpl implements MovieFavorService {
                 member.getMemName()
         );
     }
-
 }

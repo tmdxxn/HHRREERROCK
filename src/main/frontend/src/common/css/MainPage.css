@@ -89,17 +89,17 @@
 figure{
     position: relative;
 }
-figcaption{
-    width: 500px;
-    height: 300px;
-    position: absolute;
-    left: calc(110px);
-    top: calc(10%);
-    /* border: 1px solid black; */
-    background-color: rgba(179, 179, 179, 0.7);
-    padding: 10px;
+/*figcaption{*/
+/*    width: 500px;*/
+/*    height: 300px;*/
+/*    position: absolute;*/
+/*    left: calc(110px);*/
+/*    top: calc(10%);*/
+/*    !* border: 1px solid black; *!*/
+/*    background-color: rgba(179, 179, 179, 0.7);*/
+/*    padding: 10px;*/
 
-}
+/*}*/
 .movie_title{
     /* font-size: 2rem; */
     text-align: center;
@@ -142,23 +142,23 @@ figcaption{
     transition: 0.3s;
 }
 
-/* 포스터 제목 css */
-.movie_list li a::after{
-    content: "반지의 제왕";
-    text-align: center;
+
+/* 포스터 hover시 제목 올라오는 효과*/
+.movie_list li:hover .MoviePosterFigcaption{
+    bottom: 0%;
+}
+
+.MoviePosterFigcaption{
     width: 200px;
-    height: 100px;
+    height: 90px;
+    padding-top: 10px;
+    text-align: center;
     background-color: rgba(0,0,0,0.3);
     color: white;
     position: absolute;
     transition: 0.5s;
-    bottom: -40%;
+    bottom: 70%;
     left: 0%;
-
-}
-/* 포스터 hover시 제목 올라오는 효과*/
-.movie_list li:hover ::after{
-    bottom: 0%;
 }
 
 /* 포스터 hover시 포스터가 올라가고 뒤에 그림자 효과 */
