@@ -30,6 +30,8 @@ public record CustomUserDetails(MemberEntity memberEntity) implements UserDetail
         return memberEntity.getMemNum();
     }
 
+    public MemberEntity getMember() { return memberEntity; }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -49,4 +51,6 @@ public record CustomUserDetails(MemberEntity memberEntity) implements UserDetail
     public boolean isEnabled() {
         return true;
     }
+
+
 }

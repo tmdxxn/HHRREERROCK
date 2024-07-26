@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.movie.rock.common.MovieException.*;
 
@@ -56,53 +57,77 @@ public class MovieReviewServiceImpl implements MovieReviewService {
         }
 
         //페이지 10개씩, 생성시간을 기준으로 내림차순
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        Pageable pageable = PageRequest.of(page - 1, 5);
 
         //영화리뷰목록 가져오기
         Page<MovieReviewEntity> reviewPage = movieReviewRepository.findByMovieIdOrderByLatestDateDesc(movieId, pageable);
 
+        // 본인 리뷰가 있고 현재 페이지가 1페이지인 경우
+        List<MovieReviewResponseDTO> reviewDTOs = new ArrayList<>();
+        boolean ownReviewAdded = false;
+
         // 본인 리뷰 찾기
         Optional<MovieReviewEntity> ownReviewOptional = movieReviewRepository.findByMovieIdAndMemberNum(movieId, member.getMemNum());
 
-        // 본인 리뷰가 있고 현재 페이지가 1페이지인 경우
-        List<MovieReviewResponseDTO> reviewDTOs;
-
         if (ownReviewOptional.isPresent() && page == 1) {
-            MovieReviewEntity ownReview = ownReviewOptional.get();
-            reviewDTOs = new ArrayList<>();
-            reviewDTOs.add(MovieReviewResponseDTO.fromEntity(ownReview, ownReview.getMember()));
-
-            // 나머지 리뷰 추가 (본인 리뷰 제외)
-            reviewDTOs.addAll(reviewPage.getContent().stream()
-                    .filter(review -> !review.getReviewId().equals(ownReview.getReviewId()))
-                    .map(review -> MovieReviewResponseDTO.fromEntity(review, review.getMember()))
-                    .collect(Collectors.toList()));
-        } else {
-            // 본인 리뷰가 없거나 1페이지가 아닌 경우 모든 리뷰 추가
-            reviewDTOs = reviewPage.getContent().stream()
-                    .map(review -> MovieReviewResponseDTO.fromEntity(review, review.getMember()))
-                    .collect(Collectors.toList());
+            reviewDTOs.add(MovieReviewResponseDTO.fromEntity(ownReviewOptional.get(), ownReviewOptional.get().getMember()));
         }
+
+        // 나머지 리뷰 추가 (본인 리뷰 제외, 최대 5개)
+        reviewPage.getContent().stream()
+                .filter(review -> !review.getMember().getMemNum().equals(member.getMemNum()))
+                .limit(5 - reviewDTOs.size())
+                .forEach(review -> reviewDTOs.add(MovieReviewResponseDTO.fromEntity(review, review.getMember())));
+
+
+//        List<MovieReviewResponseDTO> reviewDTOs = reviewPage.getContent().stream()
+//                .map(review -> {
+//                    MovieReviewResponseDTO dto = MovieReviewResponseDTO.fromEntity(review, review.getMember());
+//                    return dto;
+//                })
+//                .collect(Collectors.toList());
+
+
+//        if (ownReviewOptional.isPresent() && page == 1) {
+//            MovieReviewEntity ownReview = ownReviewOptional.get();
+//            reviewDTOs = new ArrayList<>();
+//            reviewDTOs.add(MovieReviewResponseDTO.fromEntity(ownReview, ownReview.getMember()));
+//
+//            // 나머지 리뷰 추가 (본인 리뷰 제외)
+//            reviewDTOs.addAll(reviewPage.getContent().stream()
+//                    .filter(review -> !review.getReviewId().equals(ownReview.getReviewId()))
+//                    .map(review -> MovieReviewResponseDTO.fromEntity(review, review.getMember()))
+//                    .toList());
+//        } else {
+//            // 본인 리뷰가 없거나 1페이지가 아닌 경우 모든 리뷰 추가
+//            reviewDTOs = reviewPage.getContent().stream()
+//                    .map(review -> MovieReviewResponseDTO.fromEntity(review, review.getMember()))
+//                    .collect(Collectors.toList());
+//        }
 
         //총 리뷰수 계산 (본인 리뷰 있다면  +1)
         long totalElements = reviewPage.getTotalElements() + (ownReviewOptional.isPresent() ? 1 : 0);
 
         //페이징
-        int totalPages = (int) ((reviewPage.getTotalElements() + 9) / 10);
-        int currentPage = page;
-        int startPage = Math.max(currentPage - 4, 1);
-        int endPage = Math.min(currentPage + 5, totalPages);
+//        int totalPages = (int) ((reviewPage.getTotalElements() + 9) / 10);
+//        int currentPage = page;
+//        int startPage = Math.max(currentPage - 4, 1);
+//        int endPage = Math.min(currentPage + 5, totalPages);
+        long totalReviews = reviewPage.getTotalElements();
+        int totalPages = reviewPage.getTotalPages();
+
+        List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                .boxed().collect(Collectors.toList());
 
         return MovieReviewPageResponseDTO.builder()
                 .reviews(reviewDTOs)
-                .currentPage(currentPage)
-                .startPage(startPage)
-                .endPage(endPage)
+                .currentPage(page)
+                .pageNumbers(pageNumbers)
                 .totalPages(totalPages)
-                .hasPrevious(currentPage > 1)
-                .hasNext(currentPage < totalPages)
+                .hasPrevious(page > 1)
+                .hasNext(page < totalPages)
                 .ownReview(ownReviewOptional.map(review -> MovieReviewResponseDTO.fromEntity(review, member)).orElse(null))
-                .totalReviews(getTotalReviews(movieId))
+                .totalReviews(totalReviews)
                 .averageRating(getAverageRating(movieId))
                 .build();
     }
@@ -117,6 +142,10 @@ public class MovieReviewServiceImpl implements MovieReviewService {
 
         if (movieReviewRepository.existsByMemberMemNumAndMovieMovieId(member.getMemNum(), movieId)) {
             throw new DuplicateReviewException();
+        }
+
+        if (requestDTO.getReviewContent().length() > 50) {
+            throw new ExceedReviewCharacterException();
         }
 
         MovieEntity movie = movieRepository.findById(movieId)
@@ -138,6 +167,10 @@ public class MovieReviewServiceImpl implements MovieReviewService {
     public MovieReviewResponseDTO updateMovieReview(Long movieId, Long reviewId, MovieReviewRequestDTO requestDTO, MemberEntity member) {
         MovieReviewEntity existingReview = movieReviewRepository.findByIdWithMemberAndMovie(movieId, reviewId)
                 .orElseThrow(ReviewNotFoundException::new);
+
+        if (requestDTO.getReviewContent().length() > 50) {
+            throw new ExceedReviewCharacterException();
+        }
 
         if (!existingReview.getMember().getMemNum().equals(member.getMemNum())) {
             throw new UnauthorizedAccessException();

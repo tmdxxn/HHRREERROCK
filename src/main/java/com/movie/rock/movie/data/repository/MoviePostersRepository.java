@@ -4,9 +4,12 @@ import com.movie.rock.movie.data.entity.MoviePostersEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface MoviePostersRepository extends JpaRepository<MoviePostersEntity, Long> {
-    Optional<MoviePostersEntity> findFirstByMovieMovieId(Long movieId);
+    List<MoviePostersEntity> findByMovie_MovieId(Long movieId);
+
+    void deleteByMovie_MovieId(Long movieId);
+
 }

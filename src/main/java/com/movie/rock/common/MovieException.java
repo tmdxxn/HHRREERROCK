@@ -60,4 +60,12 @@ public class MovieException extends RuntimeException {
     public static class PostersByMovieNotFoundException extends MovieException {
         public PostersByMovieNotFoundException() { super("해당 영화의 포스터를 찾을 수 없습니다.", "ERR_POSTERS_NOT_FOUND", HttpStatus.NOT_FOUND); }
     }
+
+    public static class R_RatedMovieException extends MovieException {
+        public R_RatedMovieException() { super("청소년 관람 불가 등급의 영화입니다.", "ERR_R_RATED_MOVIE", HttpStatus.BAD_REQUEST); }
+    }
+
+    public static class ExceedReviewCharacterException extends MovieException {
+        public ExceedReviewCharacterException() { super("리뷰는 50자 내로 작성해야 합니다.", "ERR_EXCEED_CHARACTER", HttpStatus.BAD_REQUEST); }
+    }
 }

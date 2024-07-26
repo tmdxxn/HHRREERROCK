@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,12 +28,12 @@ public class AdminMovieFirstInfoResponseDTO {
 
     //생성자
     @Builder
-    public AdminMovieFirstInfoResponseDTO(Long movieId, String movieTitle, List<GenreResponseDTO> movieGenres
+    public AdminMovieFirstInfoResponseDTO(Long movieId,String movieTitle, List<GenreResponseDTO> movieGenres
             , int runTime, Integer openYear, String movieRating, String movieDescription
-            , List<ActorResponseDTO>movieActors , List<DirectorResponseDTO> movieDirectors){
+            , List<ActorResponseDTO> movieActors, List<DirectorResponseDTO> movieDirectors) {
         this.movieId = movieId;
         this.movieTitle = movieTitle;
-        this.movieGenres =movieGenres;
+        this.movieGenres = movieGenres;
         this.runTime = runTime;
         this.openYear = openYear;
         this.movieRating = movieRating;
@@ -42,32 +43,35 @@ public class AdminMovieFirstInfoResponseDTO {
     }
 
     //생성자에 넣을 데이터
-    public static AdminMovieFirstInfoResponseDTO fromEntity(MovieEntity movieEntity){
+    public static AdminMovieFirstInfoResponseDTO fromEntity(MovieEntity movieEntity) {
         return AdminMovieFirstInfoResponseDTO.builder()
                 .movieId(movieEntity.getMovieId())
                 .movieTitle(movieEntity.getMovieTitle())
-                .movieGenres(movieEntity.getGenres().stream()
-                        .map(movieGenre -> GenreResponseDTO.builder()
-                                .genreId(movieGenre.getGenre().getGenreId())
-                                .genreName(movieGenre.getGenre().getGenreName())
-                                .build())
-                        .collect(Collectors.toList()))
+                .movieGenres(movieEntity.getGenres() != null ?
+                        movieEntity.getGenres().stream()
+                                .map(movieGenre -> GenreResponseDTO.builder()
+                                        .genreId(movieGenre.getGenre().getGenreId())
+                                        .genreName(movieGenre.getGenre().getGenreName())
+                                        .build())
+                                .collect(Collectors.toList()) : Collections.emptyList())
                 .runTime(movieEntity.getRunTime())
+                .openYear(movieEntity.getOpenYear())
                 .movieRating(movieEntity.getMovieRating())
                 .movieDescription(movieEntity.getMovieDescription())
-                .movieActors(movieEntity.getMovieActors().stream()
-                        .map(movieActors -> ActorResponseDTO.builder()
-                                .actorId(movieActors.getActor().getActorId())
-                                .actorName(movieActors.getActor().getActorName())
-                                .build())
-                        .collect(Collectors.toList()))
-                .movieDirectors(movieEntity.getMovieDirectors().stream()
-                        .map(movieDirectors -> DirectorResponseDTO.builder()
-                                .directorId(movieDirectors.getDirector().getDirectorId())
-                                .directorName(movieDirectors.getDirector().getDirectorName())
-                                .build())
-                        .collect(Collectors.toList()))
+                .movieActors(movieEntity.getMovieActors() != null ?
+                        movieEntity.getMovieActors().stream()
+                                .map(movieActors -> ActorResponseDTO.builder()
+                                        .actorId(movieActors.getActor().getActorId())
+                                        .actorName(movieActors.getActor().getActorName())
+                                        .build())
+                                .collect(Collectors.toList()) : Collections.emptyList())
+                .movieDirectors(movieEntity.getMovieDirectors() != null ?
+                        movieEntity.getMovieDirectors().stream()
+                                .map(movieDirectors -> DirectorResponseDTO.builder()
+                                        .directorId(movieDirectors.getDirector().getDirectorId())
+                                        .directorName(movieDirectors.getDirector().getDirectorName())
+                                        .build())
+                                .collect(Collectors.toList()) : Collections.emptyList())
                 .build();
     }
-
 }

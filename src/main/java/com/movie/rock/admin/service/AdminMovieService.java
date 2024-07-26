@@ -6,6 +6,8 @@ import com.movie.rock.movie.data.response.MovieInfoResponseDTO.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface AdminMovieService {
 
 
@@ -27,25 +29,44 @@ public interface AdminMovieService {
     //MovieAdminServiceImpl -> 포스터 추가
     PosterResponseDTO addPoster(AdminPosterRequestDTO adminPosterRequestDTO);
 
-    //MovieAdminServiceImpl -> 영화 추가(첫번째 페이지)
-    AdminMovieFirstInfoResponseDTO adminMovieFirstInfoResponseDTO(AdminMovieFirstInfoRequestDTO adminMovieFirstInfoRequestDTO);
 
-    //MovieAdminServiceImpl -> 영화 추가(두번째 페이지)
-    AdminMovieSecondInfoResponseDTO adminMovieSecondInfoResponseDTO(AdminMovieSecondInfoRequestDTO adminMovieSecondInfoRequestDTO);
+    //영화 아이디,이름 저장
+    AdminMovieFirstInfoTitleResponseDTO saveTitleInfo(AdminMovieFirstInfoTitleRequestDTO adminMovieFirstInfoTitleRequestDTO);
+
+    //영화 첫번째 추가페이지(이름,아이디 제외)
+    AdminMovieFirstInfoResponseDTO saveFirstInfo(Long movieId,AdminMovieFirstInfoRequestDTO adminMovieFirstInfoRequestDTO);
+
+    //영화 두번째 추가 페이지(통합 업로드)
+    AdminMovieSecondInfoResponseDTO addCompleteMovie(AdminMovieSecondInfoRequestDTO adminMovieSecondInfoRequestDTO);
+
 
     //MovieAdminServiceImpl -> 배우 추가
     ActorResponseDTO addActor(AdminActorRequestDTO adminActorRequestDTO);
 
     //MovieAdminServiceImpl -> 영화 삭제
-    void deleteMovie(Long movieId);
+    void deleteMovies(List<Long> movieIds);
 
     //영화수정
     AdminMovieFirstInfoResponseDTO updateMovieFirst(Long movieId,AdminMovieFirstInfoRequestDTO adminMovieFirstInfoRequestDTO);
 
-    //영화 첫번째 추가 페이지수정
-    AdminMovieSecondInfoResponseDTO updateMovieSecond(Long movieId,AdminMovieSecondInfoRequestDTO adminMovieSecondInfoRequestDTO);
+    //영화 두번째 추가 페이지수정
+    AdminMovieSecondInfoResponseDTO updateMovieSecond(Long movieId,AdminMovieSecondInfoUpdateRequestDTO adminMovieSecondInfoUpdateRequestDTO);
 
     //영화 검색
     Page<AdminMovieListResponseDTO> search(AdminMovieListSearchRequestDTO searchData
             , Pageable pageable);
+
+    //영화 제목 중복검색
+    boolean existsByTitle(String movieTitle);
+
+    Page<DirectorResponseDTO> searchDirectors(String query, Pageable pageable);
+    Page<ActorResponseDTO> searchActors(String query, Pageable pageable);
+    Page<GenreResponseDTO> searchGenres(String query, Pageable pageable);
+
+
+    AdminMovieFirstInfoResponseDTO getMovieById(Long movieId);
+
+
+    AdminMovieSecondInfoResponseDTO getMovieByIdForSecondPage(Long movieId);
+
 }

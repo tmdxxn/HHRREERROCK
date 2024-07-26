@@ -17,7 +17,7 @@ public class MovieReviewEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
-    @Column(name = "review_content", nullable = false)
+    @Column(name = "review_content", nullable = false, length = 50)
     private String reviewContent;
 
     @Column(name = "review_rating", nullable = false)

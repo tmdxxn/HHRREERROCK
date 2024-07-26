@@ -2,9 +2,9 @@ package com.movie.rock.admin.data.response;
 
 
 import com.movie.rock.movie.data.entity.MovieEntity;
-import com.movie.rock.movie.data.entity.MovieFilmEntity;
-import com.movie.rock.movie.data.response.MovieInfoResponseDTO;
-import com.movie.rock.movie.data.response.MovieInfoResponseDTO.GenreResponseDTO;
+import com.movie.rock.movie.data.entity.MoviePostersEntity;
+import com.movie.rock.movie.data.entity.MovieTrailersEntity;
+import com.movie.rock.movie.data.response.MovieInfoResponseDTO.FilmResponseDTO;
 import com.movie.rock.movie.data.response.MovieInfoResponseDTO.PosterResponseDTO;
 import com.movie.rock.movie.data.response.MovieInfoResponseDTO.TrailerResponseDTO;
 import lombok.Builder;
@@ -20,23 +20,27 @@ public class AdminMovieSecondInfoResponseDTO {
     private Long movieId;
     private String movieTitle;
     private List<TrailerResponseDTO> trailer;
-    private MovieFilmEntity movieFilm;
+    private FilmResponseDTO movieFilm;
     private List<PosterResponseDTO> poster;
+    private String createDate;
+    private String modifyDate;
 
-
-    //생성자
     @Builder
-    public AdminMovieSecondInfoResponseDTO(Long movieId,String movieTitle,List<TrailerResponseDTO> trailer
-            ,MovieFilmEntity movieFilm, List<PosterResponseDTO> poster){
+    public AdminMovieSecondInfoResponseDTO(Long movieId, String movieTitle, List<TrailerResponseDTO> trailer,
+                                           FilmResponseDTO movieFilm, List<PosterResponseDTO> poster,String createDate, String modifyDate) {
         this.movieId = movieId;
         this.movieTitle = movieTitle;
         this.trailer = trailer;
         this.movieFilm = movieFilm;
         this.poster = poster;
+        this.createDate = createDate;
+        this.modifyDate = modifyDate;
     }
 
-    //생성자에 넣을 데이터
-    public static AdminMovieSecondInfoResponseDTO fromEntity(MovieEntity movieEntity){
+    public static AdminMovieSecondInfoResponseDTO fromEntity(MovieEntity movieEntity,
+                                                             List<MovieTrailersEntity> trailer, List<MoviePostersEntity> poster) {
+
+
         return AdminMovieSecondInfoResponseDTO.builder()
                 .movieId(movieEntity.getMovieId())
                 .movieTitle(movieEntity.getMovieTitle())
@@ -46,13 +50,15 @@ public class AdminMovieSecondInfoResponseDTO {
                                 .trailerUrls(movieTrailer.getTrailers().getTrailerUrls())
                                 .build())
                         .collect(Collectors.toList()))
-                .movieFilm(movieEntity.getMovieFilm())
+                .movieFilm(FilmResponseDTO.fromEntity(movieEntity.getMovieFilm()))
                 .poster(movieEntity.getPoster().stream()
                         .map(moviePoster-> PosterResponseDTO.builder()
                                 .posterId(moviePoster.getPosters().getPosterId())
                                 .posterUrls(moviePoster.getPosters().getPosterUrls())
                                 .build())
                         .collect(Collectors.toList()))
+                .createDate(movieEntity.getCreateDate())
+                .modifyDate(movieEntity.getModifyDate())
                 .build();
     }
 }

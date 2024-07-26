@@ -1,5 +1,6 @@
 package com.movie.rock.movie.data.entity;
 
+import com.movie.rock.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,14 +12,14 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Table(name = "movies")
-public class MovieEntity {
+public class MovieEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movie_id")
     private Long movieId;
 
-    @Column(name = "movie_name")
+    @Column(name = "movie_title")
     private String movieTitle;
 
     @Column(name = "run_time")

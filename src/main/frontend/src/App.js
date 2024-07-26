@@ -3,14 +3,14 @@ import {BrowserRouter, Route, Routes,} from 'react-router-dom';
 
 // page import
 import CustomerOutlet from './common/pages/CustomerOutlet';
-import AdminOutlet from './common/pages/AdminOutlet';
+import AdminOutlet from "./common/pages/AdminOutlet";
 import LoginOutlet from './common/pages/LoginOutlet';
 
 // movie
 import MainPage from './movie/pages/MainPage';
 import MoviePage from './movie/pages/MoviePage';
 import MovieSearch from './movie/pages/MovieSearchPage';
-import MoviePlayPage from './movie/pages/MoviePlayPage';
+
 
 // member
 import MyPage from './member/pages/MyPage';
@@ -20,21 +20,27 @@ import SignUp from './member/pages/SignUpPage';
 import WithdrawMember from './member/pages/WithdrawMember';
 import LoginPage from './member/pages/LoginPage';
 
+
 //admin
 import NoticeListPage from './administrator/notice/pages/NoticeListPage';
 import NoticeViewPage from './administrator/notice/pages/NoticeViewPage';
-import NoticeWritetPage from './administrator/notice/pages/NoticeWritePage';
-import AdminNoticeListPage from './administrator/admin/pages/AdminNoticeListPage';
-import AdminMovieListPage from './administrator/admin/pages/AdminMovieListPage';
-import AdminMovieUploadPage from './administrator/admin/pages/AdminMovieUploadPage';
-import AdminMemberListPage from './administrator/admin/pages/AdminMemberListPage';
+import NoticeWritetPage from "./administrator/notice/pages/NoticeWritePage";
+import AdminNoticeListPage from "./administrator/admin/pages/AdminNoticeListPage";
+import AdminMovieListPage from "./administrator/admin/pages/AdminMovieListPage";
+import AdminMovieUploadPage from "./administrator/admin/pages/AdminMovieUploadPage";
+import AdminMovieUploadModifyPage from "./administrator/admin/pages/AdminMovieUploadModifyPage";
+import AdminMemberListPage from "./administrator/admin/pages/AdminMemberListPage";
 import AdminMovieUploadFilePage from './administrator/admin/pages/AdminMovieUploadFilePage';
+import AdminMovieUploadFileModifyPage from './administrator/admin/pages/AdminMovieUploadFileModifyPage';
+import MoviePlayPage from './movie/pages/MoviePlayPage';
+
 
 function App() {
     return (
         <BrowserRouter>
+
             <Routes>
-                {/* main header 공유 페이지 */}
+                    {/* main hedaer 공유 페이지 */}
                 <Route path="/" element={<CustomerOutlet />} >
                     <Route index path="/" element={<MainPage />} />
                     <Route path="/user/MoviePage/:movieId" element={<MoviePage />} />
@@ -44,17 +50,20 @@ function App() {
                     <Route path='/user/Notice' element={<NoticeListPage />}  />
                     <Route path='/user/Notice/:boardId' element={<NoticeViewPage />}  />
                     <Route path='/admin/Notice/Write' element={<NoticeWritetPage />}  />
+
                 </Route>
 
                 <Route element={<AdminOutlet />} >
                     {/* admin header 공유 페이지 */}
                     <Route path="/admin/Notice" element={<AdminNoticeListPage  />}  />
                     <Route path="admin/MovieList" element={<AdminMovieListPage  />}  />
-                    <Route path="admin/MovieUpload" element={<AdminMovieUploadPage  />}  />
-                    <Route path="admin/MovieUploadFile" element={<AdminMovieUploadFilePage  />}  />
+                    <Route path="/admin/MovieUpload" element={<AdminMovieUploadPage  />}  />
+                    <Route path="/admin/movie/:movieId/modify" element={<AdminMovieUploadModifyPage />} />
+                    <Route path="/admin/MovieUploadFile" element={<AdminMovieUploadFilePage  />}  />
+                    <Route path="/admin/movie/:movieId/modify2" element={<AdminMovieUploadFileModifyPage />} />
                     <Route path="admin/MemberList" element={<AdminMemberListPage  />}  />
                 </Route>
-
+                
                 <Route element={<LoginOutlet />} >
                     {/* login header 공유 페이지 */}
                     <Route path="/Login" element={<LoginPage  />}  />
@@ -62,9 +71,18 @@ function App() {
                     <Route path="/FindIdPassword" element={<FindIdPassword  />}  />
                     <Route path="/SignUp" element={<SignUp  />}  />
                     <Route path="/user/WithdrawMember" element={<WithdrawMember  />}  />
+
+
+
+
                 </Route>
+
+
+
+
             </Routes>
         </BrowserRouter>
+
     );
 }
 

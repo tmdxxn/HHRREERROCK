@@ -1,8 +1,5 @@
 package com.movie.rock.admin.data.request;
 
-
-import com.movie.rock.movie.data.entity.MovieEntity;
-import com.movie.rock.movie.data.entity.MoviePostersEntity;
 import com.movie.rock.movie.data.entity.PostersEntity;
 import lombok.Builder;
 import lombok.Getter;
