@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import google_login from '../../common/img/google_login.png';
 
@@ -11,60 +11,59 @@ function LoginPage() {
     const [username, setUsername] = useState('');
 
     useEffect(() => {
-
         const savedUsername = localStorage.getItem('savedUsername');
         if (savedUsername) {
             setUsername(savedUsername);
             setRememberMe(true);
         }
+    }, []);
 
-        const form = document.getElementById('login-form');
+    const handleSubmit = useCallback(async (e) => {
+        e.preventDefault();
 
-        // 폼 요소 가져옴
-        const handleSubmit = async (e) => {
-            e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        // 로그인 요청
+        const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                memId: username,
+                memPassword: password
+            })
+        });
 
-            // 로그인 요청
-            const response = await fetch('/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    memId: username,
-                    memPassword: password
-                })
-            });
+        // 응답 처리
+        if (response.ok) {
+            const data = await response.json();
 
-            // 응답 처리
-            if (response.ok) {
-                const data = await response.json();
+            // 로컬스토리지 토큰 & 메서드 저장
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('loginMethod', 'custom');
 
-                // 로컬스토리지 토큰 & 메서드 저장
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('loginMethod', 'custom');
-
-                if (rememberMe) {
-                    localStorage.setItem('savedUsername', username);
-                } else {
-                    localStorage.removeItem('savedUsername');
-                }
-
-                navigate('/')
+            if (rememberMe) {
+                localStorage.setItem('savedUsername', username);
             } else {
-                alert('로그인 실패');
+                localStorage.removeItem('savedUsername');
             }
-        };
 
+            navigate('/')
+        } else {
+            alert('로그인 실패');
+        }
+    }, [rememberMe, navigate]);
+
+    useEffect(() => {
+        const form = document.getElementById('login-form');
         form.addEventListener('submit', handleSubmit);
 
         return () => {
             form.removeEventListener('submit', handleSubmit);
         };
-    }, [username, rememberMe, navigate]);
+    }, [handleSubmit]);
 
     // 구글로그인 로직
     const handleGoogleLogin = () => {
@@ -73,6 +72,9 @@ function LoginPage() {
 
     const handleRememberMe = (e) => {
         setRememberMe(e.target.checked);
+        if (!e.target.checked) {
+            localStorage.removeItem('savedUsername');
+        }
     };
 
     const handleUsernameChange = (e) => {

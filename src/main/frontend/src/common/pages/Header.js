@@ -1,20 +1,32 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 
 import '../css/Header.css'
 
 function Header() {
 
 
+    const navigate = useNavigate();
+    const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
 
+    const handleLogout = async () => {
+        try {
 
+                localStorage.removeItem('accessToken');
+                setAccessToken(null);
+                alert('성공적으로 로그아웃되었습니다.');
+                navigate('/')
 
+        }
+        catch (error) {
+            console.error('handleLogout error:', error);
+        }
 
+    }
 
-
-
-
-
+    useEffect(() => {
+        setAccessToken(localStorage.getItem('accessToken'));
+    }, []);
 
 
     return (
@@ -48,16 +60,25 @@ function Header() {
                         <ul>
                             <Link to="/user/MyPage" className='white'><li>마이페이지</li></Link>
                             <Link to="/user/Notice" className='white'><li>공지사항</li></Link>
-                            <Link to="/Login" className='white'><li>로그인</li></Link>
+                            <li>
+                                {
+                                    accessToken ? (
+                                            <div onClick={handleLogout} className='logout'>로그아웃</div>
+                                        ) :
+                                        (
+                                            <Link to={"/login"}>로그인</Link>
+                                        )
+                                }
+                            </li>
                         </ul>
                     </div>
                     {/* <!-- 추후에 로그인후에 로그아웃으로 바뀌도록 작성 --> */}
                 </div>
             </header>
-            
-          
 
- 
+
+
+
 
         </>
 
