@@ -29,6 +29,8 @@ public class SignupRequestDTO {
 
     private RoleEnum memRole;
 
+    private String memProfile;
+
 
 
 }

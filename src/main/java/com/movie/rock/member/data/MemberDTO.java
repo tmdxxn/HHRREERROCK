@@ -19,18 +19,20 @@ public class MemberDTO {
     private LocalDate memBirth;
     private String memName;
     private RoleEnum memRole;
+    private String memProfile;
 
-    public MemberEntity toEntity(String encodedPassword) {
-        return MemberEntity.builder()
-                .memId(memId)
-                .memPassword(encodedPassword)
-                .memEmail(memEmail)
-                .memTel(memTel)
-                .memGender(memGender)
-                .memBirth(memBirth)
-                .memName(memName)
-                .memRole(RoleEnum.USER)
-                .build();
-    }
+//    public MemberEntity toEntity(String encodedPassword) {
+//        return MemberEntity.builder()
+//                .memId(memId)
+//                .memPassword(encodedPassword)
+//                .memEmail(memEmail)
+//                .memTel(memTel)
+//                .memGender(memGender)
+//                .memBirth(memBirth)
+//                .memName(memName)
+//                .memRole(RoleEnum.USER)
+//                .memProfile("1")
+//                .build();
+//    }
 
 }

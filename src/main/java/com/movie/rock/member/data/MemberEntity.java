@@ -49,13 +49,17 @@ public class MemberEntity {
     @Column(name = "mem_role", nullable = false)
     private RoleEnum memRole;
 
+    // 1, 2, 3, 4, 5 프로필 사진
+    @Column(name = "mem_profile")
+    private String memProfile;
+
     //DB 및 연관관계 설정
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<BoardEntity> boards = new ArrayList<>();
 
 
     @Builder
-    public MemberEntity(String memId, String memPassword, String memEmail, String memTel, String memGender, LocalDate memBirth, String memName, RoleEnum memRole) {
+    public MemberEntity(String memId, String memPassword, String memEmail, String memTel, String memGender, LocalDate memBirth, String memName, RoleEnum memRole, String memProfile) {
         this.memId = memId;
         this.memPassword = memPassword;
         this.memEmail = memEmail;
@@ -64,6 +68,7 @@ public class MemberEntity {
         this.memBirth = memBirth;
         this.memName = memName;
         this.memRole = memRole;
+        this.memProfile = memProfile;
     }
 
     // 비밀번호 변경을 위한 메서드
@@ -79,6 +84,11 @@ public class MemberEntity {
     // 전화번호 변경을 위한 메서드
     public void updateTel(String newTel) {
         this.memTel = newTel;
+    }
+
+    // 프로필 사진 변경을 위한 메서드
+    public void updateProfile(String newProfile) {
+        this.memProfile = newProfile;
     }
 
 }

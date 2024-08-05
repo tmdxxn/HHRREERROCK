@@ -149,20 +149,21 @@ public class AuthController {
 
         memberInfo.setMemNum(member.getMemNum()); //추가부분
 
-        memberInfo.setMemEmail(member.getMemEmail());
+        memberInfo.setMemId(member.getMemId());
 
         memberInfo.setMemName(member.getMemName());
 
-        memberInfo.setMemGender(member.getMemGender());
+        memberInfo.setMemEmail(member.getMemEmail());
 
-        memberInfo.setMemRole(member.getMemRole());
+        memberInfo.setMemGender(member.getMemGender());
 
         memberInfo.setMemTel(member.getMemTel());
 
-        memberInfo.setMemId(member.getMemId());
+        memberInfo.setMemRole(member.getMemRole());
+
+        memberInfo.setMemProfile(member.getMemProfile());
 
         memberInfo.setMemBirth(member.getMemBirth().toString());
-
 
         return ResponseEntity.ok(memberInfo);
     }

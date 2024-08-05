@@ -136,7 +136,7 @@ function FindIdPassword() {
 
             </div>
 
-            {message && <div className="message">{message}</div>}
+            {/*{message && <div className="message">{message}</div>}*/}
 
         </div>
     );
